@@ -20,7 +20,7 @@ Run like
 sudo ntfs-cp-recursive [OPTIONS...] DEVICE SOURCE-PATH
 ```
 
-where OPTIONS can only be:
+Allowed OPTIONS are:
 
 * `--depth DEPTH` : limit recursion depth. Use -1 (default) to not limit depth.
 
@@ -34,6 +34,8 @@ sudo ntfs-cp-recursive --dry-run /dev/sda1 cygwin64/home/michalis
 sudo ntfs-cp-recursive /dev/sda1 cygwin64/home/michalis
 ```
 
+The indicated path is copied into the current directory. In the example above, after executing `sudo ntfs-cp-recursive /dev/sda1 cygwin64/home/michalis`, you will see a subdirectory `michalis` in the current dir.
+
 ## Notes
 
 * You should run it as `root`, as NTFS tools need direct access to disk devices. That's why I show `sudo` in examples above.
@@ -42,7 +44,7 @@ sudo ntfs-cp-recursive /dev/sda1 cygwin64/home/michalis
 
 * Note that we pass `--force` underneath to ntfs-3g tools, to deal with dirty disks (the purpose of this tool is to be used on badly damaged disks).
 
-* We create subdirectories if necessary. You can rerun the script multiple times, with ever increasing `--depth`, to get more and more files.
+* We create output subdirectories if necessary. You can rerun the script multiple times, with ever increasing `--depth`, to get more and more files.
 
 * If you need to recover NTFS stuff, see also other tools from `ntfs-3g`, like `ntfsclone` with `--rescue`.
 
