@@ -177,9 +177,12 @@ var
 begin
   Writeln('Copying ', Path, ' -> ', OutputPath);
   if not DryRun then
-  begin
+  try
     FileContents := RunCommandEasily('ntfscat', ['--force', Device, Path]);
     StringToFile(OutputPath, FileContents);
+  except
+    on E: ECommandError do
+      Writeln('Failed to read file, aborting: ', E.Message);
   end;
 end;
 
