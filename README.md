@@ -4,7 +4,7 @@
 
 This is a tool to recursively copy a directory from an NTFS partition. "Recursively" means it is copied with contents (including files and subdirectories, up to a specified depth).
 
-This tool uses `ntfsls` and `ntfscat` utilities from `ntfs-3g`. The underlying `ntfs-3g` tools allow to work on an NTFS partition without mounting it. They are particularly useful when you cannot mount the partition, because the hard disk is badly damaged. In such case, the `ntfs-3g` tools allow to extract at least *some* files from the partition.
+Under the hood, this tool uses `ntfsls` and `ntfscat` utilities from `ntfs-3g`. These underlying `ntfs-3g` utilities work on an NTFS partition without mounting it. This is useful when you cannot mount the partition, e.g. because the hard disk is physically damaged. In such case, the `ntfs-3g` tools may still allow to extract at least *some* files from the partition.
 
 ## Usage
 
