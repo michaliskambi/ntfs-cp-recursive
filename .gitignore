@@ -1,0 +1,4 @@
+*.o
+*~
+ntfs-cp-recursive
+
