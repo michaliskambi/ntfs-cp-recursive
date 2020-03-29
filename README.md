@@ -24,7 +24,9 @@ where OPTIONS can only be:
 
 * `--depth DEPTH` : limit recursion depth. Use -1 (default) to not limit depth.
 
-* `--dry-run` : do not copy files or create directories. Only list what would be done.
+* `--dry-run` : do not copy files or create directories. In effect we will only list what would be done.
+
+* `--exclude MASK` : add given mask to exclude directories and files from copying. Use it multiple times to exclude many things.
 
 ```
 # Copy stuff from c:/cygwin64/home/michalis on Windows.
@@ -35,6 +37,8 @@ sudo ntfs-cp-recursive /dev/sda1 cygwin64/home/michalis
 ## Notes
 
 * You should run it as `root`, as NTFS tools need direct access to disk devices. That's why I show `sudo` in examples above.
+
+* The process is quite slow (definitely much slower than using a mounted partition). Use `--exclude` to omit subdirectories and files that are not interesting.
 
 * Note that we pass `--force` underneath to ntfs-3g tools, to deal with dirty disks (the purpose of this tool is to be used on badly damaged disks).
 

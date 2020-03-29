@@ -17,12 +17,13 @@
 
 {$mode objfpc}{$H+}{$J-}
 
-uses SysUtils, Classes, Process;
+uses SysUtils, Classes, Process, StrUtils;
 
 var
   Device, Path: String;
   DryRun: Boolean;
   Depth: Integer = -1;
+  Exclude: TStringList;
 
 { Simple parsing of command-line arguments, specific to this tool.
   Hint: for a more generic way to handle command-line arguments,
@@ -42,6 +43,14 @@ begin
       if I > ParamCount then
         raise Exception.Create('--depth requires an argument');
       Depth := StrToInt(ParamStr(I));
+      Inc(I);
+    end else
+    if ParamStr(I) = '--exclude' then
+    begin
+      Inc(I);
+      if I > ParamCount then
+        raise Exception.Create('--exclude requires an argument');
+      Exclude.Add(ParamStr(I));
       Inc(I);
     end else
     if ParamStr(I) = '--dry-run' then
@@ -67,6 +76,8 @@ begin
     raise Exception.Create('Not enough command-line parameters, required DEVICE PATH parameters');
 end;
 
+{ Glue strings using a delimiter.
+  Hint: Castle Game Engine has this in CastleStringUtils unit. }
 function GlueStrings(const Strings: array of String; const Delimiter: Char): String;
 var
   I: Integer;
@@ -145,7 +156,9 @@ end;
   This should not be used for binary files, as we're abusing Strings a bit,
   but in practice it works (and there should not be any UTF8<>xxx conversion
   between RunCommand and StringToFile, as on Linux everything is assumed
-  UTF8 always). }
+  UTF8 always).
+
+  Hint: Castle Game Engine has this in CastleFilesUtils unit, and accepting also URLs. }
 procedure StringToFile(const FileName: String; const Contents: String);
 var
   F: TStream;
@@ -177,6 +190,17 @@ begin
      (not DirectoryExists(OutputPath)) and
      (not CreateDir(OutputPath)) then
     raise Exception.CreateFmt('Cannot create directory "%s"', [OutputPath]);
+end;
+
+{ Does given argument S match any mask in Exclude list. }
+function IsExcluded(const S: String): Boolean;
+var
+  Mask: String;
+begin
+  for Mask in Exclude do
+    if IsWild(S, Mask, true) then
+      Exit(true);
+  Result := false;
 end;
 
 { Process given Path, at given CurrentDepth.
@@ -219,6 +243,9 @@ begin
       if (EntryName <> '.') and
          (EntryName <> '..') then
       begin
+        if IsExcluded(EntryName) then
+          Writeln('Ignoring excluded: ', Path + '/' + EntryName)
+        else
         if EntryType = etDirectory then
           ProcessDirectory(Path + '/' + EntryName, CurrentDepth + 1,  OutputPath)
         else
@@ -231,13 +258,16 @@ end;
 var
   FixedPath: String;
 begin
-  ParseCommandLine;
+  Exclude := TStringList.Create;
+  try
+    ParseCommandLine;
 
-  // FixedPath is like Path, but without backslashes, and without trailing slash/backslash
-  FixedPath := StringReplace(Path, '\', '/', [rfReplaceAll]);
-  if (FixedPath <> '') and
-     (FixedPath[Length(FixedPath)] = '/') then
-    FixedPath := Copy(FixedPath, 1, Length(FixedPath) - 1);
+    // FixedPath is like Path, but without backslashes, and without trailing slash/backslash
+    FixedPath := StringReplace(Path, '\', '/', [rfReplaceAll]);
+    if (FixedPath <> '') and
+       (FixedPath[Length(FixedPath)] = '/') then
+      FixedPath := Copy(FixedPath, 1, Length(FixedPath) - 1);
 
-  ProcessDirectory(FixedPath, 0, '');
+    ProcessDirectory(FixedPath, 0, '');
+  finally FreeAndNil(Exclude) end;
 end.
