@@ -67,6 +67,20 @@ begin
     raise Exception.Create('Not enough command-line parameters, required DEVICE PATH parameters');
 end;
 
+function GlueStrings(const Strings: array of String; const Delimiter: Char): String;
+var
+  I: Integer;
+begin
+  if High(Strings) = -1 then
+    Exit('');
+  Result := Strings[0];
+  for I := 1 to High(Strings) do
+    Result := Result + Delimiter + Strings[I];
+end;
+
+type
+  ECommandError = class(Exception);
+
 { Run given command, capturing standard output to a String. }
 function RunCommandEasily(const ExeName: String; const Arguments: array of String): String;
 var
@@ -76,7 +90,10 @@ begin
   if Exe = '' then
     raise Exception.CreateFmt('Cannot find "%s" tool', [ExeName]);
   if not RunCommand(Exe, Arguments, Result) then
-    raise Exception.CreateFmt('Cannot execute "%s"', [Exe]);
+    raise ECommandError.CreateFmt('Failed to execute "%s" with arguments [%s]', [
+      Exe,
+      GlueStrings(Arguments, ' ')
+    ]);
 end;
 
 { List directory contents using ntfsls. }
@@ -185,7 +202,16 @@ begin
   Writeln('Creating output directory ', OutputPath);
   CreateOutputDirectory(OutputPath);
 
-  Contents := ListDirectory(Path);
+  try
+    Contents := ListDirectory(Path);
+  except
+    on E: ECommandError do
+    begin
+      Writeln('Failed to read directory, aborting: ', E.Message);
+      Exit;
+    end;
+  end;
+
   try
     for S in Contents do
     begin
