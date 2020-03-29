@@ -2,9 +2,9 @@
 
 ## Purpose
 
-`ntfs-3g` contains tools that allow to investigate/clopy files from an NTFS partition without mounting it. They are particularly useful when you cannot mount the partition, because the hard disk is badly damaged. Even in such case, the `ntfs-3g` can extract at least *some* files.
+This is a tool to recursively copy a directory from an NTFS partition. "Recursively" means it is copied with contents (including files and subdirectories, up to a specified depth).
 
-This repository contains a tool to copy directory recursively. It builds on top of `ntfsls` and ntfscat` utilities from `ntfs-3g`.
+This tool uses `ntfsls` and `ntfscat` utilities from `ntfs-3g`. The underlying `ntfs-3g` tools allow to work on an NTFS partition without mounting it. They are particularly useful when you cannot mount the partition, because the hard disk is badly damaged. In such case, the `ntfs-3g` tools allow to extract at least *some* files from the partition.
 
 ## Usage
 
