@@ -28,6 +28,8 @@ Allowed OPTIONS are:
 
 * `--exclude MASK` : add given mask to exclude directories and files from copying. Use it multiple times to exclude many things.
 
+For example:
+
 ```
 # Copy stuff from c:/cygwin64/home/michalis on Windows.
 sudo ntfs-cp-recursive --dry-run /dev/sda1 cygwin64/home/michalis
